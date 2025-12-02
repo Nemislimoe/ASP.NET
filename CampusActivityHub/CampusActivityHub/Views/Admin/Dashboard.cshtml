@@ -1,0 +1,140 @@
+﻿@using System.Text.Json
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    // Очікується, що контролер передав у ViewBag:
+    // ViewBag.EventsByCategory => List<{ Category, Count }>
+    // ViewBag.TopEvents => List<{ Title, Count }>
+    // ViewBag.RegistrationsByMonth => List<{ Year, Month, Count }>
+    var eventsByCategoryJson = JsonSerializer.Serialize(ViewBag.EventsByCategory ?? new object[0]);
+    var topEventsJson = JsonSerializer.Serialize(ViewBag.TopEvents ?? new object[0]);
+    var regsByMonthJson = JsonSerializer.Serialize(ViewBag.RegistrationsByMonth ?? new object[0]);
+}
+
+<h1>Аналітика — Адмін</h1>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                Розподіл подій за категоріями
+            </div>
+            <div class="card-body">
+                <canvas id="chartCategories" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                ТОП-5 найпопулярніших подій
+            </div>
+            <div class="card-body">
+                <canvas id="chartTopEvents" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                Кількість реєстрацій за місяцями
+            </div>
+            <div class="card-body">
+                <canvas id="chartRegistrations" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Дані з сервера
+        const eventsByCategory = @Html.Raw(eventsByCategoryJson);
+        const topEvents = @Html.Raw(topEventsJson);
+        const regsByMonth = @Html.Raw(regsByMonthJson);
+
+        // Chart: Categories (pie)
+        (function () {
+            const labels = eventsByCategory.map(x => x.category ?? x.Category ?? x.CategoryName ?? x.Category);
+            const data = eventsByCategory.map(x => x.count ?? x.Count ?? x.CountValue ?? x.Count);
+            const ctx = document.getElementById('chartCategories').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        })();
+
+        // Chart: Top Events (bar)
+        (function () {
+            const labels = topEvents.map(x => x.title ?? x.Title);
+            const data = topEvents.map(x => x.count ?? x.Count);
+            const ctx = document.getElementById('chartTopEvents').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Кількість реєстрацій',
+                        data: data,
+                        backgroundColor: '#4e73df'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        })();
+
+        // Chart: Registrations by month (line)
+        (function () {
+            // Преобразуємо дані у послідовність місяців
+            const items = regsByMonth.map(x => ({
+                year: x.year ?? x.Year,
+                month: x.month ?? x.Month,
+                count: x.count ?? x.Count
+            })).sort((a,b) => (a.year - b.year) || (a.month - b.month));
+
+            const labels = items.map(i => `${i.year}-${String(i.month).padStart(2,'0')}`);
+            const data = items.map(i => i.count);
+
+            const ctx = document.getElementById('chartRegistrations').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Реєстрації',
+                        data: data,
+                        borderColor: '#1cc88a',
+                        backgroundColor: 'rgba(28,200,138,0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        })();
+    </script>
+}

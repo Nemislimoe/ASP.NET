@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>b6dfb53e-59dc-410c-96ea-e67914f65dcb</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Провайдер БД -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.*" />
+
+		<!-- Пакет для роботи інструментів під час розробки (не потрапляє в runtime) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+
+		<!-- Інструменти для Package Manager / CLI (не обов'язково PrivateAssets) -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*" />
+	</ItemGroup>
+
+	<!-- Якщо у вас є окрема бібліотека з DbContext, додайте ProjectReference -->
+	<!--
+  <ItemGroup>
+    <ProjectReference Include="..\CampusActivityHub.Data\CampusActivityHub.Data.csproj" />
+  </ItemGroup>
+  -->
+
+</Project>

@@ -1,0 +1,50 @@
+﻿@using CampusActivityHub.Helpers
+@model CampusActivityHub.Models.Event
+@{
+    ViewData["Title"] = "Create Event";
+    var categories = (IEnumerable<CampusActivityHub.Models.Category>)ViewBag.Categories;
+}
+<h2>Create Event</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        @Html.CategorySelect("CategoryId", categories, Model.CategoryId)
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Start At</label>
+        <input asp-for="StartAt" type="datetime-local" class="form-control" />
+        <span asp-validation-for="StartAt" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Capacity</label>
+        <input asp-for="Capacity" class="form-control" />
+        <span asp-validation-for="Capacity" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Poster (JPEG/PNG)</label>
+        <input type="file" name="poster" accept="image/png,image/jpeg" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tags</label>
+        <input id="tags-input" name="tags" class="form-control" />
+        <small class="form-text text-muted">Start typing to see suggestions.</small>
+    </div>
+
+    <button class="btn btn-primary">Create</button>
+</form>
+
+@section Scripts {
+    <script src="~/js/events.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

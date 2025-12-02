@@ -1,0 +1,96 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Campus Activity Hub PRO</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="" crossorigin="anonymous" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Campus Activity Hub PRO</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index">Події</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Events" asp-action="Index" asp-route-q="">Пошук</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Organizer" asp-action="Index">Організатори</a></li>
+                        @if (HttpContextAccessor.HttpContext.User?.IsInRole("Organizer") == true)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Organizer" asp-action="Index">Мої події</a></li>
+                        }
+                        @if (HttpContextAccessor.HttpContext.User?.IsInRole("Admin") == true)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Dashboard">Адмінка</a></li>
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
+                        @if (HttpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @HttpContextAccessor.HttpContext.User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Профіль</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Вийти</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Увійти</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-4">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="bg-light text-muted py-3 mt-auto">
+        <div class="container">
+            <div class="d-flex justify-content-between">
+                <div>© @DateTime.UtcNow.Year Campus Activity Hub PRO</div>
+                <div>
+                    <a class="text-muted me-2" asp-controller="Home" asp-action="Privacy">Політика конфіденційності</a>
+                    <a class="text-muted" asp-controller="Home" asp-action="About">Про проєкт</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="~/js/events.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
