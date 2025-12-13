@@ -1,0 +1,25 @@
+﻿@model IEnumerable<CampusActivityHubPRO.Data.Event>
+@{
+    Layout = "_Layout";
+}
+<h1>Події</h1>
+
+<div class="row">
+    @foreach (var e in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(e.PosterPath))
+                {
+                    <img src="@e.PosterPath" class="card-img-top" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@e.Title</h5>
+                    <p class="card-text">@e.Description</p>
+                    <p class="small text-muted">@e.StartAt.ToLocalTime().ToString("g") — @e.Category?.Name</p>
+                    <a href="/event/@e.Id/@(e.Title.Replace(" ", "-"))" class="btn btn-primary">Деталі</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

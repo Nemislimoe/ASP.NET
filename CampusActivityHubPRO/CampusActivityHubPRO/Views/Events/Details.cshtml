@@ -1,0 +1,179 @@
+﻿@model CampusActivityHubPRO.Data.Event
+@using System.Security.Claims
+
+@{
+    Layout = "_Layout";
+    var userId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    bool isAdmin = User?.IsInRole("Admin") == true;
+    bool isOrganizer = userId != null && userId == Model.OrganizerId && User?.IsInRole("Organizer") == true;
+    bool isStudent = User?.IsInRole("Student") == true;
+    int registeredCount = Model.Registrations?.Count ?? 0;
+
+    var tags = Model.EventTags?.Select(et => et.Tag?.Name).Where(n => !string.IsNullOrEmpty(n)).ToList() ?? new List<string>();
+    var organizerName = Model.Organizer?.Name ?? Model.OrganizerId;
+
+    // TempData messages (якщо контролери їх встановлюють)
+    var successMsg = TempData["RegisterSuccess"] as string ?? TempData["CreateSuccess"] as string ?? TempData["EditSuccess"] as string ?? TempData["DeleteSuccess"] as string;
+    var errorMsg = TempData["RegisterError"] as string ?? TempData["DeleteError"] as string;
+}
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        @if (!string.IsNullOrEmpty(successMsg))
+        {
+            <div class="alert alert-success">@successMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(errorMsg))
+        {
+            <div class="alert alert-danger">@errorMsg</div>
+        }
+
+        <h1 class="mb-2">@Model.Title</h1>
+
+        <p class="text-muted mb-1">
+            <strong>Організатор:</strong> @(string.IsNullOrEmpty(organizerName) ? "Невідомо" : organizerName)
+        </p>
+
+        <p class="mb-1">
+            <strong>Категорія:</strong> @(Model.Category?.Name ?? "Невідомо")
+        </p>
+
+        <p class="mb-1">
+            <strong>Дата і час:</strong> @Model.StartAt.ToLocalTime().ToString("g") — @Model.EndAt.ToLocalTime().ToString("g")
+        </p>
+
+        <p class="mb-3">
+            <strong>Зареєстровано:</strong> @registeredCount / @Model.Capacity
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="mb-3">
+                <h5>Опис</h5>
+                <p>@Html.Raw(Html.Encode(Model.Description).Replace("\n", "<br />"))</p>
+            </div>
+        }
+
+        @if (tags.Any())
+        {
+            <div class="mb-3">
+                <h6>Теги</h6>
+                <p>
+                    @foreach (var t in tags)
+                    {
+                        <span class="badge bg-secondary me-1">@t</span>
+                    }
+                </p>
+            </div>
+        }
+
+        <div class="mb-3">
+            @* Student: AJAX-реєстрація через існуючий API *@
+            @if (isStudent)
+            {
+                <button id="registerBtn" data-event-id="@Model.Id" class="btn btn-primary">Зареєструватися</button>
+            }
+
+            @* Organizer: редагувати / видалити (soft delete) свої події *@
+            @if (isOrganizer)
+            {
+                <a href="@Url.Action("Edit", "Organizer", new { id = Model.Id })" class="btn btn-outline-secondary ms-2">Редагувати</a>
+
+                <form action="@Url.Action("Delete", "Organizer", new { id = Model.Id })" method="post" class="d-inline ms-2">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Ви впевнені, що хочете видалити цю подію? Це буде soft delete.');">Видалити</button>
+                </form>
+            }
+
+            @* Admin: може видаляти будь-яку подію через AdminController.DeleteEvent *@
+            @if (isAdmin)
+            {
+                <form action="@Url.Action("DeleteEvent", "Admin")" method="post" class="d-inline ms-2">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Адміністратор: підтвердьте видалення події (soft delete).');">Видалити (Admin)</button>
+                </form>
+
+                <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-outline-info ms-2">Аналітика</a>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="card-title">Деталі події</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>ID:</strong> @Model.Id</li>
+                    <li><strong>Початок:</strong> @Model.StartAt.ToLocalTime().ToString("f")</li>
+                    <li><strong>Кінець:</strong> @Model.EndAt.ToLocalTime().ToString("f")</li>
+                    <li><strong>Місткість:</strong> @Model.Capacity</li>
+                    <li><strong>Категорія:</strong> @(Model.Category?.Name ?? "Невідомо")</li>
+                </ul>
+            </div>
+        </div>
+
+        <a href="@Url.Action("Index", "Events")" class="btn btn-link w-100">Повернутися до списку</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Helper: show bootstrap alert dynamically
+            function showAlert(type, text) {
+                const container = document.createElement('div');
+                container.className = 'alert alert-' + type + ' mt-3';
+                container.innerText = text;
+                const main = document.querySelector('.col-md-8');
+                if (main) main.prepend(container);
+                setTimeout(() => container.remove(), 6000);
+            }
+
+            // Register via API (uses credentials so auth cookie is sent)
+            const btn = document.getElementById('registerBtn');
+            if (btn) {
+                btn.addEventListener('click', async function () {
+                    const id = btn.getAttribute('data-event-id');
+                    if (!id) return;
+
+                    btn.disabled = true;
+                    const originalText = btn.innerText;
+                    btn.innerText = 'Обробка...';
+
+                    try {
+                        const res = await fetch(`/api/events/${id}/register`, {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: '' // якщо потрібно, можна додати comment=...
+                        });
+
+                        if (res.ok) {
+                            showAlert('success', 'Ви успішно зареєстровані.');
+                            // оновити сторінку, щоб показати новий лічильник
+                            setTimeout(() => location.reload(), 800);
+                        } else {
+                            const txt = await res.text();
+                            showAlert('danger', txt || 'Помилка реєстрації.');
+                            btn.disabled = false;
+                            btn.innerText = originalText;
+                        }
+                    } catch (err) {
+                        showAlert('danger', 'Помилка мережі. Спробуйте пізніше.');
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    }
+                });
+            }
+
+            // UX: блокування submit форм реєстрації (якщо є інші форми)
+            document.querySelectorAll('form').forEach(f => {
+                f.addEventListener('submit', function () {
+                    const submit = f.querySelector('button[type="submit"]');
+                    if (submit) { submit.disabled = true; submit.innerText = 'Обробка...'; }
+                });
+            });
+        })();
+    </script>
+}

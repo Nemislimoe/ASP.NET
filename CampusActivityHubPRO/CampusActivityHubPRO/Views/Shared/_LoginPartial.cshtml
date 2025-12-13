@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<CampusActivityHubPRO.Data.ApplicationUser> SignInManager
+@inject UserManager<CampusActivityHubPRO.Data.ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle"></i> @user?.Name
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                <li><a class="dropdown-item" href="/Student/MyRegistrations">Мої реєстрації</a></li>
+                @if (User.IsInRole("Organizer"))
+                {
+                    <li><a class="dropdown-item" href="/Organizer/MyEvents">Мої події</a></li>
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                    <li><a class="dropdown-item" href="/Admin/Dashboard">Адмін панель</a></li>
+                }
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="/Account/Logout">Вийти</a></li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item"><a class="nav-link" href="/Account/Login">Увійти</a></li>
+        <li class="nav-item"><a class="nav-link" href="/Account/Register">Реєстрація</a></li>
+    }
+</ul>

@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "_Layout";
+}
+@model dynamic
+<h2>Увійти</h2>
+
+<form asp-action="Login" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Пароль</label>
+        <input name="password" type="password" class="form-control" required />
+    </div>
+    <div class="col-12">
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+        <button type="submit" class="btn btn-primary">Увійти</button>
+        <a class="btn btn-link" href="/Account/Register">Реєстрація</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

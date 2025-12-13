@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "_Layout";
+    var eventsByCategory = ViewBag.EventsByCategory as IEnumerable<dynamic>;
+    var topEvents = ViewBag.TopEvents as IEnumerable<dynamic>;
+    var regsByMonth = ViewBag.RegsByMonth as IEnumerable<dynamic>;
+}
+<h2>Admin Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Розподіл подій за категоріями</h5>
+        <canvas id="catChart"></canvas>
+    </div>
+    <div class="col-md-6">
+        <h5>ТОП-5 подій</h5>
+        <canvas id="topChart"></canvas>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h5>Реєстрації за місяцями</h5>
+    <canvas id="regsChart"></canvas>
+</div>
+
+@section Scripts {
+    <script>
+        const catLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(eventsByCategory.Select(x => x.Name)));
+        const catData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(eventsByCategory.Select(x => x.Count)));
+
+        new Chart(document.getElementById('catChart'), {
+            type: 'pie',
+            data: { labels: catLabels, datasets: [{ data: catData }] }
+        });
+
+        const topLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(topEvents.Select(x => x.Title)));
+        const topData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(topEvents.Select(x => x.Count)));
+
+        new Chart(document.getElementById('topChart'), {
+            type: 'bar',
+            data: { labels: topLabels, datasets: [{ label: 'Registrations', data: topData, backgroundColor: 'rgba(54,162,235,0.6)' }] }
+        });
+
+        const regsLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(regsByMonth.Select(x => x.Month)));
+        const regsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(regsByMonth.Select(x => x.Count)));
+
+        new Chart(document.getElementById('regsChart'), {
+            type: 'line',
+            data: { labels: regsLabels, datasets: [{ label: 'Registrations', data: regsData, fill: false, borderColor: 'rgb(75,192,192)' }] }
+        });
+    </script>
+}

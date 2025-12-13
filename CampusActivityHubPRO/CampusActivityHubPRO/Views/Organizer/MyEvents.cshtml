@@ -1,0 +1,43 @@
+﻿@model IEnumerable<CampusActivityHubPRO.Data.Event>
+@{
+    Layout = "_Layout";
+}
+<h2>Мої події</h2>
+
+<p>
+    <a class="btn btn-success" href="/Organizer/Create">Створити нову подію</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Ви ще не створили жодної події.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Назва</th>
+                <th>Початок</th>
+                <th>К-ть зареєстр.</th>
+                <th>Кап.</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model.OrderByDescending(x => x.StartAt))
+            {
+                <tr>
+                    <td>@e.Title</td>
+                    <td>@e.StartAt.ToLocalTime().ToString("g")</td>
+                    <td>@(e.Registrations?.Count ?? 0)</td>
+                    <td>@e.Capacity</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="/Events/Edit/@e.Id">Редагувати</a>
+                        <a class="btn btn-sm btn-outline-secondary" href="/event/@e.Id/@(e.Title.Replace(" ", "-"))">Деталі</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

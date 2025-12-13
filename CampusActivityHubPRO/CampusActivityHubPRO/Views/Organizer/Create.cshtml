@@ -1,0 +1,81 @@
+﻿@model CampusActivityHubPRO.Data.Event
+@{
+    Layout = "_Layout";
+}
+<h2>Створити подію</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Назва</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Опис</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Початок</label>
+            <input asp-for="StartAt" type="datetime-local" class="form-control" />
+            <span asp-validation-for="StartAt" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Кінець</label>
+            <input asp-for="EndAt" type="datetime-local" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Категорія</label>
+        <select asp-for="CategoryId" class="form-select">
+            <option value="">Оберіть...</option>
+            @foreach (var c in ViewBag.Categories as List<CampusActivityHubPRO.Data.Category>)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Теги</label>
+        <div>
+            @foreach (var t in ViewBag.Tags as List<CampusActivityHubPRO.Data.Tag>)
+            {
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="selectedTags" value="@t.Id" id="tag@t.Id" />
+                    <label class="form-check-label" for="tag@t.Id">@t.Name</label>
+                </div>
+            }
+        </div>
+        <small class="form-text text-muted">Почніть вводити тег: <input id="tagSearch" class="form-control d-inline-block w-auto" /></small>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Постер (JPEG/PNG)</label>
+        <input type="file" name="poster" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ліміт учасників</label>
+        <input asp-for="Capacity" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">Створити</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Tag autocomplete (AJAX)
+        document.getElementById('tagSearch').addEventListener('input', async function () {
+            const q = this.value;
+            if (q.length < 2) return;
+            const res = await fetch('/api/tags/autocomplete?q=' + encodeURIComponent(q));
+            const tags = await res.json();
+            // simple suggestion: alert or console
+            console.log(tags);
+        });
+    </script>
+}

@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "_Layout";
+}
+@model dynamic
+<h2>Реєстрація</h2>
+
+<form asp-action="Register" method="post" class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label">Ім'я</label>
+        <input name="name" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Пароль</label>
+        <input name="password" type="password" class="form-control" required minlength="6" />
+        <div class="form-text">Мінімум 6 символів.</div>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Зареєструватися</button>
+        <a class="btn btn-link" href="/Account/Login">Вже маєте акаунт? Увійти</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

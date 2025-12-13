@@ -1,0 +1,52 @@
+﻿@model IEnumerable<CampusActivityHubPRO.Data.Registration>
+@{
+    Layout = "_Layout";
+}
+<h2>Мої реєстрації</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">У вас ще немає реєстрацій на події.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var r in Model.OrderByDescending(x => x.RegistrationDate))
+        {
+            <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">@r.Event?.Title</h5>
+                    <small class="text-muted">@r.RegistrationDate.ToLocalTime().ToString("g")</small>
+                </div>
+                <p class="mb-1">@r.Comment</p>
+                <small class="text-muted">Початок: @r.Event?.StartAt.ToLocalTime().ToString("g") — Категорія: @r.Event?.Category?.Name</small>
+
+                <div class="mt-2">
+                    @if (r.Event != null && r.Event.StartAt < DateTime.UtcNow && string.IsNullOrEmpty(r.Feedback))
+                    {
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#feedbackForm@r.Id">Залишити відгук</button>
+
+                        <div class="collapse mt-2" id="feedbackForm@r.Id">
+                            <form method="post" asp-controller="Student" asp-action="LeaveFeedback" class="row g-2">
+                                <input type="hidden" name="registrationId" value="@r.Id" />
+                                <div class="col-12">
+                                    <textarea name="feedback" class="form-control" rows="3" placeholder="Ваш відгук" required></textarea>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-success btn-sm">Надіслати</button>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(r.Feedback))
+                    {
+                        <div class="mt-2">
+                            <strong>Ваш відгук:</strong>
+                            <div class="border rounded p-2 mt-1">@r.Feedback</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
