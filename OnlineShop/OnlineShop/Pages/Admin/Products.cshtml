@@ -1,0 +1,42 @@
+﻿@page
+@model OnlineShop.Pages.Admin.ProductsModel
+@{
+    ViewData["Title"] = "Адмін — Товари";
+}
+
+<h2>Адмін — Товари</h2>
+
+<p class="mb-3">
+    <a asp-page="./Create" class="btn btn-success">Створити новий товар</a>
+    <a asp-page="/Products/Index" class="btn btn-secondary">Перейти до каталогу</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Назва</th>
+            <th>Категорія</th>
+            <th>Ціна</th>
+            <th>В наявності</th>
+            <th style="width:240px">Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Products)
+        {
+            <tr>
+                <td>@p.Id</td>
+                <td>@p.Name</td>
+                <td>@p.Category</td>
+                <td>@p.Price.ToString("C")</td>
+                <td>@p.StockQuantity</td>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@p.Id" class="btn btn-sm btn-info me-1">Details</a>
+                    <a asp-page="./Edit" asp-route-id="@p.Id" class="btn btn-sm btn-primary me-1">Edit</a>
+                    <a asp-page="./Delete" asp-route-id="@p.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

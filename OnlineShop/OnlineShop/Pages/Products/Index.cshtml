@@ -1,0 +1,44 @@
+﻿@page
+@model OnlineShop.Pages.Products.IndexModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h2>Товари</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="Category" asp-items="Model.CategoryList" class="form-select">
+            <option value="">Всі категорії</option>
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <select asp-for="Sort" class="form-select">
+            <option value="">Сортування</option>
+            <option value="price_asc">Ціна: зростання</option>
+            <option value="price_desc">Ціна: спадання</option>
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Фільтрувати</button>
+    </div>
+</form>
+
+<div class="row">
+    @foreach (var p in Model.Products)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@p.Name</h5>
+                    <p class="card-text">@p.Description</p>
+                    <p class="card-text"><strong>@p.Price.ToString("C")</strong></p>
+                    <p class="card-text">В наявності: @p.StockQuantity</p>
+                    <a asp-page="./Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Деталі</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

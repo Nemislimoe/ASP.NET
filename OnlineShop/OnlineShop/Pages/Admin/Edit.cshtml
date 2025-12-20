@@ -1,0 +1,44 @@
+﻿@page "{id:int}"
+@model OnlineShop.Pages.Admin.EditModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h2>Редагувати товар</h2>
+
+<form method="post" class="row g-3">
+    <input type="hidden" asp-for="Product.Id" />
+    <div class="col-md-6">
+        <label asp-for="Product.Name" class="form-label"></label>
+        <input asp-for="Product.Name" class="form-control" />
+        <span asp-validation-for="Product.Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Product.Category" class="form-label"></label>
+        <input asp-for="Product.Category" class="form-control" />
+        <span asp-validation-for="Product.Category" class="text-danger"></span>
+    </div>
+    <div class="col-md-12">
+        <label asp-for="Product.Description" class="form-label"></label>
+        <textarea asp-for="Product.Description" class="form-control"></textarea>
+        <span asp-validation-for="Product.Description" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Product.Price" class="form-label"></label>
+        <input asp-for="Product.Price" class="form-control" />
+        <span asp-validation-for="Product.Price" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Product.StockQuantity" class="form-label"></label>
+        <input asp-for="Product.StockQuantity" class="form-control" />
+        <span asp-validation-for="Product.StockQuantity" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+        <a asp-page="./Products" class="btn btn-secondary">Скасувати</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

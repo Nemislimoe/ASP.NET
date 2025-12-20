@@ -1,0 +1,29 @@
+﻿@page "{id:int}"
+@model OnlineShop.Pages.Admin.DeleteModel
+@{
+    ViewData["Title"] = "Delete Product";
+}
+
+<h2>Видалити товар</h2>
+
+@if (Model.Product == null)
+{
+    <div class="alert alert-warning">Товар не знайдено.</div>
+    <a asp-page="./Products" class="btn btn-secondary">Повернутися</a>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@Model.Product.Name</h5>
+            <p class="card-text">@Model.Product.Description</p>
+            <p class="card-text"><strong>Ціна: </strong>@Model.Product.Price.ToString("C")</p>
+            <p class="card-text"><strong>В наявності: </strong>@Model.Product.StockQuantity</p>
+        </div>
+    </div>
+
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Підтвердити видалення</button>
+        <a asp-page="./Products" class="btn btn-secondary">Скасувати</a>
+    </form>
+}

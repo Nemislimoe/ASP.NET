@@ -1,0 +1,40 @@
+﻿@page "{id:int}"
+@model OnlineShop.Pages.Admin.DetailsModel
+@{
+    ViewData["Title"] = "Product Details (Admin)";
+}
+
+<h2>Деталі товару</h2>
+
+@if (Model.Product == null)
+{
+    <div class="alert alert-warning">Товар не знайдено.</div>
+    <a asp-page="./Products" class="btn btn-secondary">Повернутися</a>
+}
+else
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h4 class="card-title">@Model.Product.Name</h4>
+            <p class="card-text">@Model.Product.Description</p>
+            <dl class="row">
+                <dt class="col-sm-3">Категорія</dt>
+                <dd class="col-sm-9">@Model.Product.Category</dd>
+
+                <dt class="col-sm-3">Ціна</dt>
+                <dd class="col-sm-9">@Model.Product.Price.ToString("C")</dd>
+
+                <dt class="col-sm-3">В наявності</dt>
+                <dd class="col-sm-9">@Model.Product.StockQuantity</dd>
+
+                <dt class="col-sm-3">Id</dt>
+                <dd class="col-sm-9">@Model.Product.Id</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a asp-page="./Edit" asp-route-id="@Model.Product.Id" class="btn btn-primary">Редагувати</a>
+            <a asp-page="./Delete" asp-route-id="@Model.Product.Id" class="btn btn-danger">Видалити</a>
+            <a asp-page="./Products" class="btn btn-secondary">Повернутися</a>
+        </div>
+    </div>
+}

@@ -1,0 +1,28 @@
+﻿@page "{id:int}"
+@model OnlineShop.Pages.Products.DetailsModel
+
+@if (Model.Product == null)
+{
+    <p>Товар не знайдено.</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-8">
+            <h2>@Model.Product.Name</h2>
+            <p>@Model.Product.Description</p>
+            <p><strong>@Model.Product.Price.ToString("C")</strong></p>
+            <p>Категорія: @Model.Product.Category</p>
+            <p>В наявності: @Model.Product.StockQuantity</p>
+
+            <form method="post" class="row g-2">
+                <div class="col-auto">
+                    <input asp-for="Quantity" class="form-control" type="number" min="1" value="1" />
+                </div>
+                <div class="col-auto">
+                    <button asp-page-handler="Add" asp-route-id="@Model.Product.Id" class="btn btn-success">Додати в корзину</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

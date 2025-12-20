@@ -1,0 +1,44 @@
+﻿@page
+@model OnlineShop.Pages.Checkout.IndexModel
+
+<h2>Оформлення замовлення</h2>
+
+@if (!Model.Items.Any())
+{
+    <p>Корзина порожня. <a asp-page="/Products/Index">Повернутися до товарів</a></p>
+}
+else
+{
+    <h4>Ваші товари</h4>
+    <ul>
+        @foreach (var it in Model.Items)
+        {
+            <li>@it.Name — @it.Quantity × @it.Price.ToString("C")</li>
+        }
+    </ul>
+    <p><strong>Загалом: </strong>@Model.Items.Sum(i => i.Price * i.Quantity).ToString("C")</p>
+
+    <form method="post" class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="Input.FirstName" class="form-label"></label>
+            <input asp-for="Input.FirstName" class="form-control" />
+            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Input.LastName" class="form-label"></label>
+            <input asp-for="Input.LastName" class="form-control" />
+            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Input.Email" class="form-label"></label>
+            <input asp-for="Input.Email" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Підтвердити замовлення</button>
+        </div>
+    </form>
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
